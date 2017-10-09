@@ -132,3 +132,21 @@ func (b *Poloniex) GetBalances() (balances map[string]Balance, err error) {
 
 	return
 }
+
+func (b *Poloniex) GetAllTradeHistory(since time.Time) (trades map[string][]Trade, err error) {
+	trades = make(map[string][]Trade)
+	payload := map[string]string{
+		"currencyPair": "all",
+		"start":        fmt.Sprintf("%d", since.Unix()),
+	}
+	r, err := b.client.doCommand("returnTradeHistory", payload)
+	if err != nil {
+		return
+	}
+
+	if err = json.Unmarshal(r, &trades); err != nil {
+		return
+	}
+
+	return
+}
