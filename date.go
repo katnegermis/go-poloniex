@@ -2,19 +2,19 @@ package poloniex
 
 import (
 	"errors"
-	"strconv"
+	"fmt"
+	"strings"
 	"time"
 )
 
-type PoloniexDate struct {
-	time.Time
-}
+type PoloniexDate time.Time
 
 func (pd *PoloniexDate) UnmarshalJSON(data []byte) error {
-	i, err := strconv.ParseInt(string(data), 10, 64)
+	s := strings.Trim(string(data), "\"")
+	t, err := time.Parse("2006-01-02 15:04:05", s)
 	if err != nil {
-		return errors.New("Timestamp invalid (can't parse int64)")
+		return errors.New(fmt.Sprintf("DateTime invalid (can't parse %s)", s))
 	}
-	pd.Time = time.Unix(i, 0)
+	*pd = PoloniexDate(t)
 	return nil
 }
